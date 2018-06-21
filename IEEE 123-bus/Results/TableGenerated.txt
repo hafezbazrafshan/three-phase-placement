@@ -1,0 +1,54 @@
+\begin{table}                                        
+\centering                                           
+\begin{tabular}{|c|c|c|c|c|c|}                       
+\hline                                               
+ & NoDg & SOCP1 & SOCP5 & SOCP25 & SOCP200 \\        
+\hline                                               
+F & 0 & 1 & 5 & 25 & 200 \\                          
+\hline                                               
+Approach & 0 & 2 & 2 & 2 & 2 \\                      
+\hline                                               
+CompTime & 0.00 & 3.15 & 0.98 & 2.92 & 53.85 \\      
+\hline                                               
+PlObj & 0.00 & 22.32 & 22.61 & 22.58 & 22.44 \\      
+\hline                                               
+SiObj & 0.00 & 22.32 & 22.61 & 22.58 & 22.45 \\      
+\hline                                               
+SiObjCr & 24.00 & 22.67 & 22.77 & 22.73 & 22.60 \\   
+\hline                                               
+Gap & - & - & - & - & - \\                           
+\hline                                               
+FiCost & 0.00 & 15.27 & 8.26 & 7.60 & 7.64 \\        
+\hline                                               
+SeCost & 24.00 & 7.40 & 14.52 & 15.13 & 14.96 \\     
+\hline                                               
+ElCost & 24.00 & 7.40 & 14.52 & 15.09 & 14.91 \\     
+\hline                                               
+CuCost & 0.00 & -0.00 & -0.00 & 0.04 & 0.06 \\       
+\hline                                               
+SumpR & 0.0000 & 1.6178 & 0.8480 & 0.7714 & 0.7749 \\
+\hline                                               
+NoDGs & 0 & 20 & 19 & 21 & 21 \\                     
+\hline                                               
+MaxpR & 0.0000 & 0.0800 & 0.0800 & 0.0800 & 0.0800 \\
+\hline                                               
+MinpR & 0.0000 & 0.0079 & 0.0042 & 0.0034 & 0.0030 \\
+\hline                                               
+AvgDCToAC & 0.00 & 3.20 & 1.47 & 1.21 & 1.21 \\      
+\hline                                               
+DVmax & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\          
+\hline                                               
+ValTotCost & 24.00 & 35.26 & 24.04 & 22.97 & 22.80 \\
+\hline                                               
+ValElCost & 24.00 & 12.68 & 15.00 & 15.22 & 15.09 \\ 
+\hline                                               
+ValCurtCost & 0.00 & 7.30 & 0.79 & 0.15 & 0.07 \\    
+\hline                                               
+ValDVmax & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\       
+\hline                                               
+Savings & - & -46.93 & -0.20 & 4.26 & 5.00 \\        
+\hline                                               
+\end{tabular}                                        
+\caption{MyTableCaption}                             
+\label{table:MyTableLabel}                           
+\end{table}
