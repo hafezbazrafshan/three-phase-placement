@@ -1,0 +1,207 @@
+MgValues=[1;5;25;200];
+DKValues=[0.2224;0.0474; 0.0089];
+CurrentFolder=pwd;
+ResultsFolder='C:\Users\aju084\Documents\MATLAB\three-phase-pv-placement\IEEE 37-bus new modeling framework\Results\Finalized';
+Scale=10^6;
+
+
+
+
+ColumnNames={'F', 'Approach', 'CompTime','PlObj','SiObj','SiObjCr', 'Gap', 'FiCost','SeCost', 'ElCost','CuCost',...
+    'DVmax', 'ValTotCost', 'ValElCost', 'ValCurtCost', 'ValDVmax', 'Savings'};
+
+
+TabulatedResults=[];
+
+
+% 0. No DGs
+cd(ResultsFolder);
+FileName=['MISOCP', num2str(1)];
+NoDg=load(FileName); 
+cd(CurrentFolder);
+NoDgCost=NoDg.PlacedNetwork.OptParams.ElectricityPrice...
+    *real(sum(cell2mat(NoDg.PlacedNetwork.Placement.ScenarioParams.SInSol)))/3/Scale;
+F=0;
+CompTime=0;
+PlObj=0;
+SiObj=0;
+SiObjCr=NoDg.PlacedNetwork.OptParams.ElectricityPrice*real(sum(cell2mat(NoDg.PlacedNetwork.Placement.ScenarioParams.SInSol)))/3/Scale;
+Gap=NaN;
+Approach=0;
+FiCost=0;
+SeCost=SiObjCr;
+ElCost=SiObjCr;
+CuCost=0;
+Vmin=min(abs(cell2mat(NoDg.PlacedNetwork.Placement.ScenarioParams.vSol)));
+Vmax=max(abs(cell2mat(NoDg.PlacedNetwork.Placement.ScenarioParams.vSol)));
+DVmax=max([Vmax-1.1, 0.9-Vmin]); 
+ValTotCost=SiObjCr;
+ValElCost=SiObjCr;
+ValCuCost=0;
+ValVmin=min(abs(cell2mat(NoDg.PlacedNetwork.Placement.ScenarioParams.vSol)));
+ValVmax=max(abs(cell2mat(NoDg.PlacedNetwork.Placement.ScenarioParams.vSol)));
+ValDVmax=max([ValVmax-1.1, 0.9-ValVmin]);
+Savings=NaN;
+
+NoDgRow={F,  Approach, CompTime,PlObj, SiObj, SiObjCr,Gap,  FiCost, SeCost, ElCost, CuCost,...
+    DVmax, ValTotCost,ValElCost,ValCuCost,ValDVmax,Savings};
+
+TabulatedResults=[TabulatedResults;NoDgRow];
+
+clear NoDg;
+
+RowNames={'NoDg'};
+
+
+
+
+for ii=1:length(MgValues)
+    
+    Mg=MgValues(ii); 
+    
+    
+    
+    
+    % 1. Analyze MISOCP
+FileName=['MISOCP', num2str(Mg)];
+cd(ResultsFolder); 
+Misocp=load(FileName); 
+FileName2=['CSDP', num2str(Mg)];
+Csdp=load(FileName2); 
+cd(CurrentFolder); 
+SizedNetwork=Misocp.SizedNetwork;
+DispatchNetwork=Misocp.DispatchNetwork;
+F=Mg;
+Approach=1;
+CompTime=SizedNetwork.Placement.TimeInfo(3)+SizedNetwork.Sizing.TimeInfo(3);
+PlObj=SizedNetwork.Placement.Objective.Value/Scale;
+SiObj=SizedNetwork.Sizing.Objective.Value/Scale;
+SiObjCr=SizedNetwork.Sizing.Objective.ValueCorrected/Scale;
+Gap=100*(SizedNetwork.Sizing.Objective.ValueCorrected-Csdp.SizedNetwork.Placement.Objective.Value)/Csdp.SizedNetwork.Placement.Objective.Value;
+FiCost=SizedNetwork.Sizing.Objective.FirstStageCost.Value/Scale;
+SeCost=SizedNetwork.Sizing.Objective.SecondStageCost.ValueCorrected/Scale;
+ElCost=SizedNetwork.Sizing.Objective.SecondStageCost.ElectricityCostCorrected/Scale;
+CuCost=SizedNetwork.Sizing.Objective.SecondStageCost.CurtailmentCost/Scale;
+Vmin=min(abs(SizedNetwork.Sizing.Variables.vCorrected(:)));
+Vmax=max(abs(SizedNetwork.Sizing.Variables.vCorrected(:)));
+DVmax=max([Vmax-1.1, 0.9-Vmin]); 
+ValTotCost=(DispatchNetwork.Sizing.Objective.FirstStageCost.Value+DispatchNetwork.Dispatch.Objective.SecondStageCost.ValueCorrected)/Scale;
+ValElCost=DispatchNetwork.Dispatch.Objective.SecondStageCost.ElectricityCostCorrected/Scale;
+ValCuCost=DispatchNetwork.Dispatch.Objective.SecondStageCost.CurtailmentCost/Scale;
+ValVmin=min(abs(DispatchNetwork.Dispatch.Variables.vCorrected(:)));
+ValVmax=max(abs(DispatchNetwork.Dispatch.Variables.vCorrected(:)));
+ValDVmax=max([ValVmax-1.1, 0.9-ValVmin]);
+Savings=100*(NoDgCost-ValTotCost)/ NoDgCost;
+
+
+MisocpRow={F, Approach,CompTime,PlObj, SiObj, SiObjCr,Gap,  FiCost, SeCost, ElCost, CuCost,...
+    DVmax, ValTotCost,ValElCost,ValCuCost,ValDVmax,Savings};
+
+RowNames=[RowNames;FileName];
+TabulatedResults=[TabulatedResults;MisocpRow];
+clear Misocp MisocpRow Csdp
+
+
+
+
+
+%%
+FileName=['SOCP', num2str(Mg)];
+cd(ResultsFolder); 
+Socp=load(FileName); 
+FileName2=['CSDP', num2str(Mg)];
+Csdp=load(FileName2); 
+cd(CurrentFolder); 
+SizedNetwork=Socp.SizedNetwork;
+DispatchNetwork=Socp.DispatchNetwork;
+F=Mg;
+Approach=2;
+CompTime=SizedNetwork.Placement.TimeInfo(3)+SizedNetwork.Sizing.TimeInfo(3);
+PlObj=SizedNetwork.Placement.Objective.Value/Scale;
+SiObj=SizedNetwork.Sizing.Objective.Value/Scale;
+SiObjCr=SizedNetwork.Sizing.Objective.ValueCorrected/Scale;
+Gap=100*(SizedNetwork.Sizing.Objective.ValueCorrected-Csdp.SizedNetwork.Placement.Objective.Value)/Csdp.SizedNetwork.Placement.Objective.Value;
+FiCost=SizedNetwork.Sizing.Objective.FirstStageCost.Value/Scale;
+SeCost=SizedNetwork.Sizing.Objective.SecondStageCost.ValueCorrected/Scale;
+ElCost=SizedNetwork.Sizing.Objective.SecondStageCost.ElectricityCostCorrected/Scale;
+CuCost=SizedNetwork.Sizing.Objective.SecondStageCost.CurtailmentCost/Scale;
+Vmin=min(abs(SizedNetwork.Sizing.Variables.vCorrected(:)));
+Vmax=max(abs(SizedNetwork.Sizing.Variables.vCorrected(:)));
+DVmax=max([Vmax-1.1, 0.9-Vmin]); 
+ValTotCost=(DispatchNetwork.Sizing.Objective.FirstStageCost.Value+DispatchNetwork.Dispatch.Objective.SecondStageCost.ValueCorrected)/Scale;
+ValElCost=DispatchNetwork.Dispatch.Objective.SecondStageCost.ElectricityCostCorrected/Scale;
+ValCuCost=DispatchNetwork.Dispatch.Objective.SecondStageCost.CurtailmentCost/Scale;
+ValVmin=min(abs(DispatchNetwork.Dispatch.Variables.vCorrected(:)));
+ValVmax=max(abs(DispatchNetwork.Dispatch.Variables.vCorrected(:)));
+ValDVmax=max([ValVmax-1.1, 0.9-ValVmin]);
+Savings=100*(NoDgCost-ValTotCost)/ NoDgCost;
+
+
+SocpRow={F, Approach, CompTime,PlObj, SiObj, SiObjCr,Gap,  FiCost, SeCost, ElCost, CuCost,...
+    DVmax, ValTotCost,ValElCost,ValCuCost,ValDVmax,Savings};
+
+RowNames=[RowNames;FileName];
+TabulatedResults=[TabulatedResults;SocpRow];
+clear Socp SocpRow Csdp
+
+
+
+
+
+%%  2. Do CSDP
+cd(ResultsFolder); 
+FileName=['CSDP', num2str(Mg)];
+Csdp=load(FileName); 
+cd(CurrentFolder);
+
+SizedNetwork=Csdp.SizedNetwork;
+DispatchNetwork=Csdp.DispatchNetwork;
+
+F=Mg;
+Approach=3;
+CompTime=SizedNetwork.Placement.TimeInfo(3)+SizedNetwork.Sizing.TimeInfo(3);
+PlObj=SizedNetwork.Placement.Objective.Value/Scale;
+SiObj=SizedNetwork.Sizing.Objective.Value/Scale;
+SiObjCr=SizedNetwork.Sizing.Objective.ValueCorrected/Scale;
+Gap=100*(SizedNetwork.Sizing.Objective.ValueCorrected-SizedNetwork.Placement.Objective.Value)/SizedNetwork.Placement.Objective.Value;
+FiCost=SizedNetwork.Sizing.Objective.FirstStageCost.Value/Scale;
+SeCost=SizedNetwork.Sizing.Objective.SecondStageCost.ValueCorrected/Scale;
+ElCost=SizedNetwork.Sizing.Objective.SecondStageCost.ElectricityCostCorrected/Scale;
+CuCost=SizedNetwork.Sizing.Objective.SecondStageCost.CurtailmentCost/Scale;
+Vmin=min(abs(SizedNetwork.Sizing.Variables.vCorrected(:)));
+Vmax=max(abs(SizedNetwork.Sizing.Variables.vCorrected(:)));
+DVmax=max([Vmax-1.1, 0.9-Vmin]); 
+ValTotCost=(DispatchNetwork.Sizing.Objective.FirstStageCost.Value+DispatchNetwork.Dispatch.Objective.SecondStageCost.ValueCorrected)/Scale;
+
+ValElCost=DispatchNetwork.Dispatch.Objective.SecondStageCost.ElectricityCostCorrected/Scale;
+ValCuCost=DispatchNetwork.Dispatch.Objective.SecondStageCost.CurtailmentCost/Scale;
+ValVmin=min(abs(DispatchNetwork.Dispatch.Variables.vCorrected(:)));
+ValVmax=max(abs(DispatchNetwork.Dispatch.Variables.vCorrected(:)));
+ValDVmax=max([ValVmax-1.1, 0.9-ValVmin]);
+Savings=100*(NoDgCost-ValTotCost)/ NoDgCost;
+
+
+CsdpRow={F, Approach, CompTime,PlObj, SiObj, SiObjCr,Gap,  FiCost, SeCost, ElCost, CuCost,...
+    DVmax, ValTotCost,ValElCost,ValCuCost,ValDVmax,Savings};
+RowNames=[RowNames;FileName];
+TabulatedResults=[TabulatedResults;CsdpRow];
+clear Csdp CsdpRow
+
+
+
+end
+
+
+
+OutputTable=cell2table(TabulatedResults,'VariableNames',ColumnNames,'RowNames',RowNames)
+
+MyTable=table2array(OutputTable); 
+MyTable=array2table(MyTable.');
+MyTable.Properties.RowNames=OutputTable.Properties.VariableNames;
+MyTable.Properties.VariableNames=OutputTable.Properties.RowNames;
+
+input.data=MyTable;
+input.dataFormat = {'%d',2, '%.2f%', 1,'%.3f',3, '%.2f',1, '%.3f',4, '%.2f', 1, '%.3f', 3, '%.2f',2 }
+input.dataFormatMode = 'row';
+ latex = latexTable(input);
+

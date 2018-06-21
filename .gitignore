@@ -1,9 +1,2 @@
-/Users/hafez/Documents/MATLAB/three-phase-pv-placement/IEEE 37-bus/Results/*.mat
-/Users/hafez/Documents/MATLAB/three-phase-pv-placement/IEEE 37-bus/PVData/*.mat
-
-/Users/hafez/Documents/MATLAB/three-phase-pv-placement/IEEE 123-bus/Results/*.mat
-/Users/hafez/Documents/MATLAB/three-phase-pv-placement/IEEE 123-bus/PVData/*.mat
-
-/Users/hafez/Documents/MATLAB/three-phase-pv-placement/IEEE 8500-node/Results/*.mat
-/Users/hafez/Documents/MATLAB/three-phase-pv-placement/IEEE 8500-node/PVData/*.mat
+*.mat
 .DS_Store

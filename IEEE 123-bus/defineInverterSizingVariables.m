@@ -1,0 +1,1 @@
+variables sR1Phi(L1Phi,1) sR3Phi(N3Phi,1) pR1Phi(L1Phi,1) pR3Phi(N3Phi,1)
